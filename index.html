@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Webchat</title>
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <meta http-equiv="pragma" content="no-cache">
+  <script type="text/javascript">
+    // Disable right-click and specific key combinations
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onkeydown = function(e) {
+      if (e.keyCode == 123 || // F12
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || // Ctrl+Shift+I
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) || // Ctrl+Shift+C
+         (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) || // Ctrl+Shift+J
+         (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { // Ctrl+U
+        return false;
+      }
+    };
+
+    // Function to disable inspection on the iframe
+    function disableIframeInspect(iframe) {
+      if (iframe) {
+        try {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+          iframeDocument.addEventListener('contextmenu', event => event.preventDefault());
+          iframeDocument.onkeydown = function(e) {
+            if (e.keyCode == 123 || // F12
+               (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || // Ctrl+Shift+I
+               (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) || // Ctrl+Shift+C
+               (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) || // Ctrl+Shift+J
+               (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { // Ctrl+U
+              return false;
+            }
+          };
+        } catch (e) {
+          console.error('Error accessing iframe:', e);
+        }
+      }
+    }
+
+    // Continuously check for iframe and apply restrictions
+    function observeIframes() {
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          mutation.addedNodes.forEach(node => {
+            if (node.tagName === 'IFRAME' && node.classList.contains('botpress-webchat')) {
+              node.onload = () => disableIframeInspect(node);
+            }
+          });
+        });
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // Prevent inspection of the main document
+    function disableMainDocumentInspect() {
+      window.addEventListener('devtoolschange', function(event) {
+        if (event.detail.open) {
+          document.body.innerHTML = '';
+          alert('Inspect element is disabled!');
+        }
+      });
+
+      window.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', observeIframes);
+    window.addEventListener('load', () => {
+      const iframe = document.querySelector('iframe.botpress-webchat');
+      if (iframe) {
+        disableIframeInspect(iframe);
+      }
+    });
+
+    // Periodically check for the iframe and reapply restrictions
+    setInterval(() => {
+      const iframe = document.querySelector('iframe.botpress-webchat');
+      if (iframe) {
+        disableIframeInspect(iframe);
+      }
+    }, 1000);
+
+    // Apply restrictions to the main document
+    disableMainDocumentInspect();
+  </script>
+</head>
+<body>
+  <!-- Webchat Integration -->
+  <div id="webchat"></div>
+  <script src="https://cdn.botpress.cloud/webchat/v1/inject.js"></script>
+  <script>
+    window.botpressWebChat.init({
+      "composerPlaceholder": "Chat with Exam Companion",
+      "botConversationDescription": "Made by Shuvodip",
+      "botId": "f034ec91-56b5-48bf-be98-bc9698a89904",
+      "hostUrl": "https://cdn.botpress.cloud/webchat/v1",
+      "messagingUrl": "https://messaging.botpress.cloud",
+      "clientId": "f034ec91-56b5-48bf-be98-bc9698a89904",
+      "webhookId": "332692d5-30cd-42d4-82ec-b124dbff475a",
+      "lazySocket": true,
+      "themeName": "eggplant",
+      "botName": "Exam Companion",
+      "phoneNumber": "7074181267",
+      "emailAddress": "shuvodipduttabanik@gmail.com",
+      "frontendVersion": "v1",
+      "useSessionStorage": true,
+      "enableConversationDeletion": true,
+      "theme": "eggplant",
+      "themeColor": "#f76b15",
+      "allowedOrigins": []
+    });
+  </script>
+</body>
+</html>
